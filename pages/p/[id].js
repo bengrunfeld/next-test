@@ -1,15 +1,22 @@
-import { useRouter } from "next/router";
+import fetch from "isomorphic-unfetch";
 import Layout from "../../components/Layout";
 
-const Post = () => {
-  const router = useRouter();
+const Post = props => (
+  <Layout>
+    <h1>{props.show.name}</h1>
+    <p>{props.show.summary.replace(/<[/]?[pb]>/g, "")}</p>
+    <img src={props.show.image.medium} />
+  </Layout>
+);
 
-  return (
-    <Layout>
-      <h1>{router.query.id}</h1>
-      <p>This is the blog post contenty content</p>
-    </Layout>
-  );
+Post.getInitialProps = async context => {
+  const { id } = context.query;
+  const res = await fetch(`https://api.tvmaze.com/shows/${id}`);
+  const show = await res.json();
+
+  console.log(`Fetched show: ${show.name}`);
+
+  return { show };
 };
 
 export default Post;
